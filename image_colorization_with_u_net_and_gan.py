@@ -641,55 +641,11 @@ train_model(model, train_dl, 20)
 If you are on Colab and want to use the pretrained weights, run the following cells which download the weights from my google drive and loads it to the model:
 """
 
-# !gdown --id 1lR6DcS4m5InSbZ5y59zkH2mHt_4RQ2KV
+
 
 # net_G = build_res_unet(n_input=1, n_output=2, size=256)
 # net_G.load_state_dict(torch.load("res18-unet.pt", map_location=device))
 # model = MainModel(net_G=net_G)
 # model.load_state_dict(torch.load("final_model_weights.pt", map_location=device))
 
-"""Now, I will show the results of this final model on the test set (the black and white images that it has never seen during training) including the main title image of this article at the very beginning:
 
-![output 1](https://github.com/moein-shariatnia/Deep-Learning/blob/main/Image%20Colorization%20Tutorial/files/main.png?raw=1)
-Left: Input black & white images from test set | Right: the colorized outputs by the final model of this tutorial
----
-![output2](https://github.com/moein-shariatnia/Deep-Learning/blob/main/Image%20Colorization%20Tutorial/files/img1.png?raw=1)
-Left: Input black & white images from test set | Right: the colorized outputs by the final model of this tutorial
----
-![output3](https://github.com/moein-shariatnia/Deep-Learning/blob/main/Image%20Colorization%20Tutorial/files/img2.png?raw=1)
-Left: Input black & white images from test set | Right: the colorized outputs by the final model of this tutorial
----
-
-## An accidental finding: You can safely remove Dropout!
-
-Remember that when I was explaining the theory of conditional GAN in the beginning of this article, I said that the source of the noise in the architecture of the generator proposed by authors of the paper was the dropout layers. However, when I investigated the U-Net we built with the help of fastai, I did not find any dropout layers in there! Actually I first trained the final model and got the results and then I investigated the generator and found this out.
-
-So, was the adversarial training useless? If there is no noise, how possibly the generator can have a creative effect on the output? Is it possible that the input grayscale image to the generator plays the role of noise as well? These were my exact questions at the time.
-
-Therefor, I decided to email Dr. Phillip Isola, the first author of the same paper we implemented here, and he kindly answered these questions. According to what he said,  this conditional GAN can still work without dropout but the outputs will be more deterministic because of the lack of that noise; however, there is still enough information in that input grayscale image which enables the generator to produce compelling outputs.
-Actually, I saw this in practice that the adversarial training was helpful indeed. In the next and last section, I'm going to compare the results of the pretrained U-Net with no adversarial training against the final outputs we got with adversarial training.
-
-## Comparing the results of the pretrained U-Net with and without adversarial training
-
-One of the cool thing I found in my experiments was that the U-Net we built with the ResNet18 backbone is already awesome in colorizing images after pretraining with L1 Loss only (a step before the final adversarial training). But, the model is still conservative and encourages using gray-ish colors when it is not sure about what the object is or what color it should be. However, it performs really awesome for common scenes in the images like sky, tree, grass, etc.
-
-Here I show you the outputs of the U-Net without adversarial training and U-Net with adversarial training to better depict the significant difference that the adversarial training is making in our case:
-
-![comparison](https://github.com/moein-shariatnia/Deep-Learning/blob/main/Image%20Colorization%20Tutorial/files/comparison1.png?raw=1)
-(Left: pretrained U-Net without adversarial training | Right: pretrained U-Net with adversarial training)
----
-
-You can also see the GIF below to observe the difference between the images better:
-
-![anim](https://github.com/moein-shariatnia/Deep-Learning/blob/main/Image%20Colorization%20Tutorial/files/anim_compare.gif?raw=1)
-(animation of the last two images to better see the significant difference that adversarial training is making)
----
-
-## Final words
-
-This project was full of important lessons for myself. I spent a lot of time during the last month to implement lots of different papers each with different strategies and it took quite a while and after A LOT of failures that I could come up with this method of training. Now you can see that how pretraining the generator significantly helped the model and improved the results.
-
-I also learned that some observations, although at first feeling like a bad mistake of yours, are worth paying attention to and further investigation; like the case of dropout in this project. Thanks to the helpful community of deep learning and AI, you can easily ask experts and get the answer you need and become more confidant in what you were just guessing.
-
-I want to thank the authors of this wonderful paper for their awesome work and also [the great GitHub repository of this paper](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix) from which I borrowed some of the codes (with modification and simplification). I truly love the community of computer science and AI and all their hard work to improve the field and also make their contributions available to all. I'm happy to be a tiny part of this community.
-"""
